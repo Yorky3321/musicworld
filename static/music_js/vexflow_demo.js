@@ -1,5 +1,4 @@
 import * as VexFlow from 'https://cdn.skypack.dev/vexflow@4.2.3';
-import * as Tone from 'https://unpkg.com/tone';
 const VF = VexFlow;
 
 // 主容器
@@ -13,15 +12,16 @@ let Xpos = 30;                                    // 初始五線譜X軸
 let measure = [];                                 // 宣告音符總集
 let note;                                         // 宣告每小節的音符集
 let count = 0;                                    // 計數器用來設定初始譜面
+let Crow = 1;                                     // 計數器用來設定譜面行數
 let noteInfoList = [];                            // 存放所有音符的區域和位置資訊
 let selectedNoteInfo = null;                      // 儲存被選到的 note 資訊
 
 // ✅ 畫譜邏輯包成一個函式
-function canvasCreate(width) {
+function canvasCreate(width, row) {
   Xpos = 30;
   staveY = 20;
   canvas.width = width;
-  canvas.height = 2000;
+  canvas.height = 30 + 100*row;
 }
 
 //  設定音符
@@ -29,7 +29,7 @@ function NoteSet(position, index, key, keyhigh, duration) {
   console.log("NoteSet被呼叫了")
   const notes = measure[position];
   notes[index] = new VF.StaveNote({ keys: [key+"/"+keyhigh], duration: duration });
-  canvasCreate(window.innerWidth * 0.9);
+  canvasCreate(window.innerWidth * 0.9, Crow);
   StaveRecreate();
 }
 
@@ -46,16 +46,19 @@ function StaveCreate() {
   ];
   measure.push(note);
 
-  const notes = measure[count];
+  const notes = measure[measure.length - 1];
   const voice = new VF.Voice({ time: { num_beats: 4, beat_value: 4 } });
   voice.addTickables(notes);
 
   const formatter = new VF.Formatter();
   const minGap = notes.length * 35;   // 每個音符的間隔值
   let staveWidth = formatter.preCalculateMinTotalWidth([voice]) + minGap;
-  if ((Xpos + staveWidth) > (container.clientWidth - 60) ) {
+  if ((Xpos + staveWidth + 30) > (container.clientWidth - 60) ) {
     staveY += 100;
     Xpos = 30;
+    Crow += 1;
+    canvasCreate(window.innerWidth * 0.9, Crow);
+    StaveRecreate();
   }
 
   let stave;                // 提前宣告變數stave
@@ -151,12 +154,12 @@ function StaveRecreate() {
 }
 
 // 初次載入
-canvasCreate(window.innerWidth * 0.9);
+canvasCreate(window.innerWidth * 0.9, Crow);
 StaveCreate();
 
 // 視窗尺寸改變時，重繪 canvas
 window.addEventListener('resize', () => {
-  canvasCreate(window.innerWidth * 0.9);
+  canvasCreate(window.innerWidth * 0.9, Crow);
   StaveRecreate();
 });
 
@@ -195,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (found) break;
     };
-    canvasCreate(window.innerWidth * 0.9);
+    canvasCreate(window.innerWidth * 0.9, Crow);
     StaveRecreate();
     // 呼叫 NoteSet()
   });
@@ -226,65 +229,3 @@ document.addEventListener('DOMContentLoaded', () => {
     console.warn('找不到 <button data-action="Note-Set">');
   };
 })
-
-
-function getMelodyFromMeasure() {
-  const melody = [];
-
-  let time = 0;
-  for (const group of measure) {
-    for (const note of group) {
-      const keys = note.getKeys();  // 例如 ["c/4"]
-      const duration = note.getDuration(); // 例如 "q", "8", "qr"
-
-      if (duration.endsWith("r")) {
-        time += getToneDuration(duration.replace("r", ""));
-        continue; // 休止符不播
-      }
-
-      const key = keys[0];
-      const [pitch, octave] = key.split("/");
-
-      melody.push({
-        time: time,
-        note: pitch.toUpperCase() + octave,
-        duration: getToneDuration(duration),
-      });
-
-      time += getToneDuration(duration);
-    }
-  }
-
-  return melody;
-}
-
-function getToneDuration(vexflowDuration) {
-  switch (vexflowDuration) {
-    case "w": return 4;
-    case "h": return 2;
-    case "q": return 1;
-    case "8": return 0.5;
-    case "16": return 0.25;
-    default: return 1;
-  }
-}
-
-async function playScoreMelody() {
-  await Tone.start();
-
-  const synth = new Tone.Synth().toDestination();
-  const melody = getMelodyFromMeasure();
-
-  // 避免播放重疊
-  Tone.Transport.stop();
-  Tone.Transport.cancel();
-  Tone.Transport.position = 0;
-
-  const part = new Tone.Part((time, value) => {
-    synth.triggerAttackRelease(value.note, value.duration, time);
-  }, melody).start(0);
-
-  Tone.Transport.start();
-}
-
-export { measure, playScoreMelody };
