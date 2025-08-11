@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>註冊 | 響樂城</title>
+  <style>
+    body {
+      font-family: '微軟正黑體', Arial, sans-serif;
+      background-color: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .register-box {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 360px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #1f2937;
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #374151;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 16px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #2563eb;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1e40af;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="register-box">
+    <h2>註冊帳號</h2>
+    <form action="/registerin/" method="post">
+      {% csrf_token %}
+      <label>帳號（Username）</label>
+      <input type="text" name="username" required>
+
+      <label>電子郵件（Email）</label>
+      <input type="text" name="email" required>
+
+      <label>密碼（Password）</label>
+      <input type="password" name="password1" required>
+
+      <label>再次確認密碼</label>
+      <input type="password" name="password2" required>
+
+      <button type="submit">註冊</button>
+    </form>
+  </div>
+</body>
+</html>

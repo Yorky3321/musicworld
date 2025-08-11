@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ room.name }} 聊天室</title>
+    <style>
+        body {
+            font-family: '微軟正黑體', Arial, sans-serif;
+            background: #f9f9fb;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 640px;
+            margin: 48px auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #ddd;
+            padding: 28px 36px;
+        }
+        .header-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #4f46e5;
+            text-decoration: none;
+            margin-bottom: 12px;
+        }
+        .chat-title {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #2b3c5e;
+        }
+        .chat-desc {
+            color: #888;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+        }
+        .messages {
+            height: 320px;
+            overflow-y: auto;
+            background: #f4f6fb;
+            padding: 12px;
+            border-radius: 8px;
+        }
+        .msg-item {
+            margin-bottom: 14px;
+            border: 2px solid #ccc;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        .border-blue-400 { border-color: #60a5fa; }
+        .border-red-400 { border-color: #f87171; }
+        .border-green-400 { border-color: #4ade80; }
+
+        .msg-user {
+            font-weight: bold;
+            color: #1d4ed8;
+        }
+        .msg-anon {
+            font-weight: bold;
+            color: #818cf8;
+        }
+        .msg-content {
+            margin-left: 8px;
+        }
+        .msg-time {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        .msg-actions a {
+            font-size: 0.8rem;
+            margin-left: 6px;
+        }
+        .chat-form {
+            margin-top: 18px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .chat-form input,
+        .chat-form textarea,
+        .chat-form select {
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 6px;
+        }
+        .chat-form button {
+            border: none;
+            border-radius: 6px;
+            background: #1d4ed8;
+            color: white;
+            font-weight: bold;
+            padding: 8px 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 🔗 回首頁連結 -->
+        <a href="/" class="header-link">
+            🎵 音樂站
+        </a>
+
+        <!-- 🏷️ 聊天室標題與說明 -->
+        <div class="chat-title">{{ room.name }}</div>
+        <div class="chat-desc">{{ room.description }}</div>
+        <hr>
+
+        <!-- 💬 訊息區 -->
+        <div class="messages" id="msgbox">
+            {% for msg in messages %}
+                <div class="msg-item
+                    {% if msg.tag == 'question' %}border-blue-400
+                    {% elif msg.tag == 'announcement' %}border-red-400
+                    {% elif msg.tag == 'discussion' %}border-green-400
+                    {% endif %}">
+                    <span class="msg-tag">
+                        {% if msg.tag == 'question' %}❓
+                        {% elif msg.tag == 'announcement' %}📢
+                        {% elif msg.tag == 'discussion' %}💬
+                        {% endif %}
+                    </span>
+                    {% if msg.user %}
+                        <span class="msg-user">{{ msg.user.username }}</span>
+                    {% else %}
+                        <span class="msg-anon">{{ msg.anonymous_name|default:"匿名" }}</span>
+                    {% endif %}
+                    <span class="msg-time">{{ msg.created_at|date:"H:i:s" }}</span>：
+                    <span class="msg-content">{{ msg.content|linebreaks }}</span>
+
+                    {% if msg.user == user %}
+                        <span class="msg-actions">
+                            <a href="{% url 'edit-message' msg.id %}">✏️ 編輯</a>
+                            <a href="{% url 'delete-message' msg.id %}" onclick="return confirm('確定要刪除這則留言嗎？')">❌ 刪除</a>
+                        </span>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p>暫無留言</p>
+            {% endfor %}
+        </div>
+
+        <!-- 📝 發送表單 -->
+        <form class="chat-form" method="post" action="">
+            {% csrf_token %}
+            {% if not user.is_authenticated %}
+                <input type="text" name="anonymous_name" placeholder="暱稱(匿名)" style="width:100px;" required>
+            {% endif %}
+
+            <select name="tag">
+                <option value="">一般</option>
+                <option value="question">❓ 問題</option>
+                <option value="announcement">📢 公告</option>
+                <option value="discussion">💬 討論</option>
+            </select>
+
+            <textarea name="content" rows="1" cols="30" placeholder="輸入訊息..." required style="flex:1;"></textarea>
+            <button type="submit">送出</button>
+        </form>
+    </div>
+
+    <script>
+        // 自動滾到底
+        var msgbox = document.getElementById("msgbox");
+        if (msgbox) msgbox.scrollTop = msgbox.scrollHeight;
+
+        // 支援 Enter 送出
+        const chatForm = document.querySelector('.chat-form');
+        const textarea = chatForm.querySelector('textarea');
+        textarea.addEventListener('keydown', function(e){
+            if(e.key === 'Enter' && !e.shiftKey){
+                e.preventDefault();
+                chatForm.submit();
+            }
+        });
+    </script>
+</body>
+</html>

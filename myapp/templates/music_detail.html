@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ music.title }} - 音樂詳情{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto p-6 bg-white shadow rounded">
+
+  {% if messages %}
+    <ul class="mb-4">
+      {% for message in messages %}
+        <li class="p-2 mb-2 rounded
+                   {% if message.tags == 'success' %}bg-green-100 text-green-800
+                   {% elif message.tags == 'error' %}bg-red-100 text-red-800
+                   {% else %}bg-gray-100 text-gray-800{% endif %}">
+          {{ message }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <h2 class="text-xl font-bold mb-4">🎵 {{ music.title }}</h2>
+  <p>上傳者：{{ music.uploader.username }}</p>
+  <p>總分：{{ music.vote_score|default:0 }}</p>
+  <p>上傳時間：{{ music.created_at|date:"Y-m-d H:i" }}</p>
+  <audio controls class="my-4 w-full">
+    <source src="{{ music.audio_file.url }}" type="audio/mpeg">
+    您的瀏覽器不支援音樂播放。
+  </audio>
+
+  <h3 class="text-lg font-semibold mt-6 mb-2">留言區</h3>
+
+{% for comment in comments %}
+  <div class="border p-2 rounded mb-2 bg-gray-50">
+    <strong>{{ comment.user.username }}</strong>：{{ comment.text }}
+    <div class="text-sm text-gray-500">
+      （{{ comment.created_at|date:"Y-m-d H:i" }}）
+    </div>
+
+    {% if comment.user == user %}
+      <div class="mt-2 space-x-2">
+        <form method="post" action="{% url 'delete_comment' comment.pk %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="text-red-500">刪除</button>
+        </form>
+
+        <a href="{% url 'edit_comment' comment.pk %}" class="text-blue-600 underline">編輯</a>
+      </div>
+    {% endif %}
+  </div>
+{% empty %}
+  <p>暫無留言</p>
+{% endfor %}
+
+{% if user.is_authenticated %}
+  <form method="post" class="mt-4" action="{% url 'post_comment' music.pk %}">
+    {% csrf_token %}
+    {{ comment_form.as_p }}
+    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">留言</button>
+  </form>
+{% else %}
+  <p class="text-gray-500 mt-2">
+    請先 <a href="{% url 'login' %}" class="text-blue-600 underline">登入</a> 才能留言
+  </p>
+{% endif %}
+</div>
+{% endblock %}

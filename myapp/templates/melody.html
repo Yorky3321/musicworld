@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>五線譜展示</title>
+    {% load static %}
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <style>
+        #staff-container {
+            width: window.innerWidth * 0.9;
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        canvas {
+            display: block;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <!-- 🔗 回首頁連結 -->
+    <nav class="bg-white shadow p-4 flex justify-between">
+        <a href="/" class="text-xl font-bold text-blue-600">🎵 音樂站</a>
+    </nav>
+
+    <h1>五線譜顯示 Demo</h1>
+
+    <button data-action="add">新增小節</button>
+
+    <select id="note-select">
+        選取音色
+        <option>c</option><option>d</option><option>e</option>
+        <option>f</option><option>g</option><option>a</option><option>b</option>
+    </select>
+
+    <select id="pitch-select">
+        選取音高
+        <option>3</option><option>4</option><option>5</option>
+    </select>
+
+    <select id="duration-select">
+        選取長度
+        <option>q</option>
+        <option>休止符/qr</option>
+    </select>
+
+    <button data-action="Note-Set">設定音符</button>
+
+    <div id="staff-container">
+        <canvas id='score'></canvas>
+    </div>
+
+    <button id="export-midi">匯出 MIDI</button>
+    <button id="download-midi" style="display:none;">下載 MIDI</button>
+    <button id="download-wav" style="display:none;">下載 WAV</button>
+
+    <!-- ✅ 播放整音階 -->
+    <button onclick="playScale()">播放音階</button>
+
+    <!-- ✅ 載入 JS 模組 -->
+    <script type="module" src="{% static 'music_js/vexflow_demo.js' %}"></script>
+    <script type="module" src="{% static 'music_js/export_midi.js' %}"></script>
+    <script type="module" src="{% static 'music_js/player_bridge.js' %}"></script>
+
+    <!-- ✅ Tone 播放邏輯（基本範例）-->
+    <script>
+      async function playScale() {
+        await Tone.start();
+        const synth = new Tone.Synth().toDestination();
+        const notes = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
+        notes.forEach((note, i) => {
+          synth.triggerAttackRelease(note, '8n', Tone.now() + i * 0.5);
+        });
+      }
+
+      async function playMelody() {
+        await Tone.start();
+        const synth = new Tone.Synth().toDestination();
+        const melody = [
+          { time: 0, note: 'C4', duration: '8n' },
+          { time: 0.5, note: 'D4', duration: '8n' },
+          { time: 1.0, note: 'E4', duration: '8n' },
+          { time: 1.5, note: 'F4', duration: '8n' },
+        ];
+        const part = new Tone.Part((time, value) => {
+          synth.triggerAttackRelease(value.note, value.duration, time);
+        }, melody).start(0);
+
+        Tone.Transport.start();
+      }
+    </script>
+</body>
+</html>

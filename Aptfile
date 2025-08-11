@@ -1,0 +1,4 @@
+fluidsynth
+pulseaudio
+libpulse0
+libpulse-mainloop-glib0

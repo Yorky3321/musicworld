@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <title>響樂城 音樂世界</title>
+  <style>
+    body {
+      font-family: '微軟正黑體', Arial, sans-serif;
+      background: #f9f9fb;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 48px auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px #ccc;
+      padding: 40px;
+      border: 3px solid #000;
+    }
+
+    h1 {
+      font-size: 32px;
+      color: #2e2e2e;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: 22px;
+      color: #444;
+      margin: 30px 0 16px 0;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .btn-group {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .btn-group a {
+      display: inline-block;
+      background: #2563eb;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin: 6px;
+      transition: background 0.3s;
+    }
+
+    .btn-group a.upload {
+      background: #4b5563;
+    }
+
+    .btn-group a:hover {
+      background: #1e40af;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 2px solid black;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      border: 1px solid #000;
+      text-align: center;
+      font-size: 15px;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #374151;
+    }
+
+    tr:hover {
+      background: #f3f4f6;
+    }
+
+    .vote-form {
+      display: inline;
+      margin: 0 3px;
+    }
+
+    .vote-form button {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .pagination {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .pagination a {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #d1d5db;
+      border-radius: 6px;
+      text-decoration: none;
+      margin: 0 4px;
+      font-weight: bold;
+      color: #111827;
+    }
+
+    .auth-bar {
+      text-align: right;
+      margin: 12px 20px 0 0;
+      font-size: 15px;
+    }
+
+    .auth-bar a {
+      color: #6b21a8;
+      text-decoration: none;
+    }
+
+    .comment-btn a {
+      display: inline-block;
+      padding: 6px 12px;
+      background: #10b981;
+      color: white;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .comment-btn a:hover {
+      background: #059669;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-bar">
+    {% if user.is_authenticated %}
+      你好, <b>{{ user.username }}</b>！<a href="{% url 'logout' %}">登出</a>
+    {% else %}
+      <a href="{% url 'login' %}">登入/註冊</a>
+    {% endif %}
+  </div>
+
+  <div class="container">
+    <h1>🎵 音樂世界 🎵</h1>
+
+    <div class="btn-group">
+      <a href="{% url 'chat-room' 1 %}">💬 聊天室大廳</a>
+      <a href="{% url 'melody' %}">🎼 五線譜</a>
+      <a href="{% url 'upload_music' %}" class="upload">📄 推薦 / 上傳音樂</a>
+    </div>
+
+    <h2>🎵 推薦音樂</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>NO.</th>
+          <th>歌名</th>
+          <th>上傳者</th>
+          <th>總分</th>
+          <th>上傳時間</th>
+          <th>投票</th>
+          <th>留言</th> <!-- 新增欄位 -->
+        </tr>
+      </thead>
+      <tbody>
+        {% for music in page_obj %}
+        <tr>
+          <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+            <td>
+            <button onclick="openPlayer('{{ music.title }}', '{{ music.audio_file.url }}')" style="background: #2563eb; color: white; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer;">
+                ▶️ {{ music.title }}
+            </button>
+            </td>
+          <td>{{ music.uploader.username }}</td>
+          <td>{{ music.vote_score|default:0 }}</td>
+          <td>{{ music.created_at|date:"Y-m-d H:i" }}</td>
+          <td>
+            {% if user.is_authenticated %}
+              <form action="{% url 'vote' music.id %}" method="post" class="vote-form">
+                {% csrf_token %}
+                <input type="hidden" name="value" value="1">
+                <button>👍</button>
+              </form>
+              <form action="{% url 'vote' music.id %}" method="post" class="vote-form">
+                {% csrf_token %}
+                <input type="hidden" name="value" value="-1">
+                <button>👎</button>
+              </form>
+            {% else %}
+              <span>登入後可投票</span>
+            {% endif %}
+          </td>
+          <td class="comment-btn">
+            <a href="{% url 'music_detail' music.pk %}">💬 留言</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7">暫無音樂</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="pagination">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">上一頁</a>
+      {% endif %}
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">下一頁</a>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>
+<script>
+  function openPlayer(title, url) {
+    const playerWindow = window.open("", "_blank", "width=400,height=200");
+    playerWindow.document.write(`
+      <html lang="zh-Hant">
+        <head>
+          <title>播放：${title}</title>
+          <style>
+            body { font-family: sans-serif; padding: 20px; text-align: center; background: #f9f9f9; }
+            h2 { color: #1e3a8a; margin-bottom: 20px; }
+          </style>
+        </head>
+        <body>
+          <h2>🎵 ${title}</h2>
+          <audio controls autoplay style="width: 100%;">
+            <source src="${url}" type="audio/mpeg">
+            您的瀏覽器不支援播放音樂
+          </audio>
+        </body>
+      </html>
+    `);
+  }
+</script>

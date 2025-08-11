@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <style>
+  .form-control {
+    @apply border-2 border-black rounded px-3 py-2 w-full;
+  }
+</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}響樂城 音樂世界{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <nav class="bg-white shadow p-4 flex justify-between">
+    <a href="/" class="text-xl font-bold text-blue-600">🎵 音樂站</a>
+    <div>
+      {% if user.is_authenticated %}
+        <span class="mr-4">👤 {{ user.username }}</span>
+        <a href="{% url 'logout' %}" class="text-red-500">登出</a>
+      {% else %}
+        <a href="{% url 'login' %}" class="text-blue-500 mr-4">登入</a>
+        <a href="{% url 'register' %}" class="text-blue-500">註冊</a>
+      {% endif %}
+    </div>
+  </nav>
+  <main class="max-w-3xl mx-auto mt-6 p-4 bg-white shadow rounded">
+      {% if messages %}
+        <div style="display: none;">
+          {% for message in messages %}
+            <div>{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

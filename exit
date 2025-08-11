@@ -1,0 +1,101 @@
+[33mcommit 6ca417d8b9fcdca1f8686365e47265da0032bc01[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m
+Author: Yorky3321 <magicyork666@gmail.com>
+Date:   Mon Aug 11 15:33:18 2025 +0800
+
+    Delete Unesessary
+
+[33mcommit e14968d1bdfe8dcc762ba3d4c787fa36e61446f4[m[33m ([m[1;31mheroku/master[m[33m)[m
+Author: Yorky3321 <magicyork666@gmail.com>
+Date:   Sat Aug 9 17:25:36 2025 +0800
+
+    make it better
+
+[33mcommit b6c70c5c271b3a42900a56578182d0921f91f22d[m
+Author: Yorky3321 <magicyork666@gmail.com>
+Date:   Sat Aug 9 17:12:45 2025 +0800
+
+    make it better
+
+[33mcommit 73fbf5e0b4aa1988a56cc61ef4a81036fd42035b[m
+Author: Yorky3321 <magicyork666@gmail.com>
+Date:   Sat Aug 9 17:12:20 2025 +0800
+
+    clear cache
+
+[33mcommit 0d6d9dc9db1447d719a2898cf5f1a82445da5f2d[m
+Author: Yorky3321 <magicyork666@gmail.com>
+Date:   Sat Aug 9 17:01:47 2025 +0800
+
+    make it better
+
+[33mcommit 4c0e4f68d586d4189859c8015d59118cdf3fe7a3[m
+Author: Yorky3321 <magicyork666@gmail.com>
+Date:   Sat Aug 9 16:51:05 2025 +0800
+
+    Force redeploy
+
+[33mcommit 1653694554723eaaa715ac3de4321346a7476574[m
+Author: Yorky3321 <magicyork666@gmail.com>
+Date:   Fri Aug 8 15:56:21 2025 +0800
+
+    make it better
+
+[33mcommit 9ad40ab80e0199ec9dc31ea546f39d45695140f6[m
+Author: Yorky3321 <magicyork666@gmail.com>
+Date:   Fri Aug 8 15:45:32 2025 +0800
+
+    make it better
+
+[33mcommit 22bb253c1206a92cb8e8a169a60bc8aa920597e1[m
+Author: Yorky3321 <magicyork666@gmail.com>
+Date:   Fri Aug 8 15:36:40 2025 +0800
+
+    make it better
+
+[33mcommit a75089ff850c344948edba797b4330906cecd082[m
+Author: Yorky3321 <magicyork666@gmail.com>
+Date:   Fri Aug 8 15:33:26 2025 +0800
+
+    make it better
+
+[33mcommit 2833e8d76c46e34aa4c6fd0e40126539d783eef1[m
+Author: Yorky3321 <magicyork666@gmail.com>
+Date:   Fri Aug 8 15:26:10 2025 +0800
+
+    make it better
+
+[33mcommit b3c940796735254d0b8b85ff48a7490fb5890e18[m
+Author: Yorky3321 <magicyork666@gmail.com>
+Date:   Fri Aug 8 15:25:24 2025 +0800
+
+    make it better
+
+[33mcommit ebb1644c3748b29995cc75f20261be6ec6397e51[m
+Author: sin chun ko <sky820917@yahoo.com.tw>
+Date:   Wed Aug 6 21:48:34 2025 +0800
+
+    Remove midi2audio for Heroku compatibility
+
+[33mcommit f3dfe7001a377b38d0ee8cbf48cca632a57b3932[m
+Author: sin chun ko <sky820917@yahoo.com.tw>
+Date:   Wed Aug 6 21:41:24 2025 +0800
+
+    initial deploy
+
+[33mcommit 85dd0aba45439b7f118df3302461673032821ebf[m
+Author: sin chun ko <sky820917@yahoo.com.tw>
+Date:   Wed Aug 6 20:39:56 2025 +0800
+
+    Cleaned requirements.txt for Heroku
+
+[33mcommit 7282de625cfd46338245b2aedb8629a95b4ed4c3[m
+Author: sin chun ko <sky820917@yahoo.com.tw>
+Date:   Wed Aug 6 20:35:08 2025 +0800
+
+    Move requirements.txt to root
+
+[33mcommit 889c8a358dfb385ed3215bfc69e54ecaf81ac408[m
+Author: sin chun ko <sky820917@yahoo.com.tw>
+Date:   Wed Aug 6 20:27:53 2025 +0800
+
+    Initial Heroku deploy

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>編輯留言</title>
+</head>
+<body>
+    <h2>編輯留言</h2>
+    <form method="post">
+        {% csrf_token %}
+        <select name="tag" required>
+            <option value="">一般</option>
+            <option value="question" {% if message.tag == 'question' %}selected{% endif %}>❓ 問題</option>
+            <option value="announcement" {% if message.tag == 'announcement' %}selected{% endif %}>📢 公告</option>
+            <option value="discussion" {% if message.tag == 'discussion' %}selected{% endif %}>💬 討論</option>
+        </select>
+        <br><br>
+        <textarea name="content" rows="4" cols="50" required>{{ message.content }}</textarea>
+        <br><br>
+        <button type="submit">更新留言</button>
+        <a href="{% url 'chat-room' message.room.id %}">取消</a>
+    </form>
+</body>
+</html>
