@@ -31,8 +31,8 @@ function canvasCreate(width) {
     const minGap = notes.length * 35;
     let staveWidth = formatter.preCalculateMinTotalWidth([voice]) + minGap;
 
-    if ((X + staveWidth) > (container.clientWidth - 60)) {
-      X = 30;
+    if ((X + staveWidth) >= (width - 60)) {
+      X = Xpos;
       Crow += 1;
     }
     X += staveWidth;
@@ -65,7 +65,8 @@ function StaveCreate() {
 
 // 畫面改變時全部重畫
 function StaveRecreate() {
-  canvasCreate(window.innerWidth * 0.9);
+  let width = window.innerWidth * 0.9
+  canvasCreate(width);
   noteInfoList = [];
   let X = Xpos;
   let Y = staveY;
@@ -77,9 +78,9 @@ function StaveRecreate() {
     const formatter = new VF.Formatter();
     const minGap = notes.length * 35;   // 每個音符的間隔值
     let staveWidth = formatter.preCalculateMinTotalWidth([voice]) + minGap;
-    if ((X + staveWidth) > (container.clientWidth - 60) ) {
+    if ((X + staveWidth) > (width - 60) ) {
       Y += 100;
-      X = 30;
+      X = Xpos;
     }
     let stave;                // 提前宣告變數stave
 
