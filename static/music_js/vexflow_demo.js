@@ -7,21 +7,38 @@ const canvas = document.getElementById("score");
 const renderer = new VF.Renderer(canvas, VF.Renderer.Backends.CANVAS);     // 初始化畫布
 const context = renderer.getContext();                                     // 選定畫布
 const firstGap = 80;                              // 設定第一欄的五線譜要預留的空位
-let staveY = 20;                                  // 初始五線譜高度
-let Xpos = 30;                                    // 初始五線譜X軸
+const staveY = 20;                                // 初始五線譜高度
+const Xpos = 30;                                  // 初始五線譜X軸
 let measure = [];                                 // 宣告音符總集
 let note;                                         // 宣告每小節的音符集
-let count = 0;                                    // 計數器用來設定初始譜面
 let Crow = 1;                                     // 計數器用來設定譜面行數
 let noteInfoList = [];                            // 存放所有音符的區域和位置資訊
 let selectedNoteInfo = null;                      // 儲存被選到的 note 資訊
 
 // ✅ 畫譜邏輯包成一個函式
-function canvasCreate(width, row) {
-  Xpos = 30;
-  staveY = 20;
+function canvasCreate(width) {
+    // 初始化參數
+  Crow = 1;
+  let X = Xpos;
+
+  // 走一遍所有小節，計算需要幾行，更新 Crow
+  for (let i = 0; i < measure.length; i++) {
+    const notes = measure[i];
+    const voice = new VF.Voice({ time: { num_beats: 4, beat_value: 4 } });
+    voice.addTickables(notes);
+
+    const formatter = new VF.Formatter();
+    const minGap = notes.length * 35;
+    let staveWidth = formatter.preCalculateMinTotalWidth([voice]) + minGap;
+
+    if ((X + staveWidth) > (container.clientWidth - 60)) {
+      X = 30;
+      Crow += 1;
+    }
+    X += staveWidth;
+  }
   canvas.width = width;
-  canvas.height = 30 + 100*row;
+  canvas.height = 30 + 100 * Crow;
 }
 
 //  設定音符
@@ -29,7 +46,6 @@ function NoteSet(position, index, key, keyhigh, duration) {
   console.log("NoteSet被呼叫了")
   const notes = measure[position];
   notes[index] = new VF.StaveNote({ keys: [key+"/"+keyhigh], duration: duration });
-  canvasCreate(window.innerWidth * 0.9, Crow);
   StaveRecreate();
 }
 
@@ -45,59 +61,14 @@ function StaveCreate() {
     new VF.StaveNote({ keys: ["b/4"], duration: "qr" }),
   ];
   measure.push(note);
-
-  const notes = measure[measure.length - 1];
-  const voice = new VF.Voice({ time: { num_beats: 4, beat_value: 4 } });
-  voice.addTickables(notes);
-
-  const formatter = new VF.Formatter();
-  const minGap = notes.length * 35;   // 每個音符的間隔值
-  let staveWidth = formatter.preCalculateMinTotalWidth([voice]) + minGap;
-  if ((Xpos + staveWidth + 30) > (container.clientWidth - 60) ) {
-    staveY += 100;
-    Xpos = 30;
-    Crow += 1;
-    canvasCreate(window.innerWidth * 0.9, Crow);
-    StaveRecreate();
-  }
-
-  let stave;                // 提前宣告變數stave
-
-  if ( Xpos === 30) {                           // 判斷是否為第一個
-      staveWidth += firstGap;
-      stave = new VF.Stave(Xpos, staveY, staveWidth);    // 建立五線譜
-      stave.addClef("treble").addTimeSignature("4/4");
-    } else {
-      stave = new VF.Stave(Xpos, staveY, staveWidth);    // 建立五線譜
-    }
-
-  stave.setContext(context).draw();                      // 畫出五線譜
-  formatter.joinVoices([voice]).format([voice], stave.getWidth() - 60);      // 格式化音符
-  voice.draw(context, stave);                            // 畫上音符
-  let InfoList = notes.map((note, index) => {
-    const bb = note.getBoundingBox();
-    const info = {
-      index,
-      note,
-      noteIndex: measure.findIndex(group => group.includes(note)),
-      x: bb ? bb.getX() : null,
-      y: bb ? bb.getY() : null,
-      width: bb ? bb.getW() : null,
-      height: bb ? bb.getH() : null,
-      // pitch: note.keys,
-      // duration: note.duration
-    };
-    return info
-  });
-  noteInfoList.push(InfoList);
-
-  Xpos += staveWidth;
-  count ++;
 }
 
 // 畫面改變時全部重畫
 function StaveRecreate() {
-  noteInfoList = []
+  canvasCreate(window.innerWidth * 0.9);
+  noteInfoList = [];
+  let X = Xpos;
+  let Y = staveY;
   for (let i = 0; i < measure.length; i ++) {
     const notes = measure[i];
     const voice = new VF.Voice({ time: { num_beats: 4, beat_value: 4 } });
@@ -106,18 +77,18 @@ function StaveRecreate() {
     const formatter = new VF.Formatter();
     const minGap = notes.length * 35;   // 每個音符的間隔值
     let staveWidth = formatter.preCalculateMinTotalWidth([voice]) + minGap;
-    if ((Xpos + staveWidth) > (container.clientWidth - 60) ) {
-      staveY += 100;
-      Xpos = 30;
+    if ((X + staveWidth) > (container.clientWidth - 60) ) {
+      Y += 100;
+      X = 30;
     }
     let stave;                // 提前宣告變數stave
 
-    if ( Xpos === 30) {                           // 判斷是否為第一個
+    if ( X === 30) {                           // 判斷是否為第一個
       staveWidth += firstGap;
-      stave = new VF.Stave(Xpos, staveY, staveWidth);    // 建立五線譜
+      stave = new VF.Stave(X, Y, staveWidth);    // 建立五線譜
       stave.addClef("treble").addTimeSignature("4/4");
     } else {
-      stave = new VF.Stave(Xpos, staveY, staveWidth);    // 建立五線譜
+      stave = new VF.Stave(X, Y, staveWidth);    // 建立五線譜
     }
     stave.setContext(context).draw();
     //畫上音符
@@ -149,17 +120,16 @@ function StaveRecreate() {
     });
     noteInfoList.push(InfoList);
 
-    Xpos += staveWidth;
+    X += staveWidth;
   }
 }
 
 // 初次載入
-canvasCreate(window.innerWidth * 0.9, Crow);
 StaveCreate();
+StaveRecreate();
 
 // 視窗尺寸改變時，重繪 canvas
 window.addEventListener('resize', () => {
-  canvasCreate(window.innerWidth * 0.9, Crow);
   StaveRecreate();
 });
 
@@ -170,6 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnAdd) {
     btnAdd.addEventListener('click', () => {
       StaveCreate();
+      StaveRecreate();
     });
   } else {
     console.warn('找不到 <button data-action="add">');
@@ -198,7 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (found) break;
     };
-    canvasCreate(window.innerWidth * 0.9, Crow);
     StaveRecreate();
     // 呼叫 NoteSet()
   });
@@ -229,3 +199,5 @@ document.addEventListener('DOMContentLoaded', () => {
     console.warn('找不到 <button data-action="Note-Set">');
   };
 })
+
+export { measure };

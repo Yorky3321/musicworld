@@ -55,40 +55,9 @@
     <button id="download-midi" style="display:none;">下載 MIDI</button>
     <button id="download-wav" style="display:none;">下載 WAV</button>
 
-    <!-- ✅ 播放整音階 -->
-    <button onclick="playScale()">播放音階</button>
-
     <!-- ✅ 載入 JS 模組 -->
     <script type="module" src="{% static 'music_js/vexflow_demo.js' %}"></script>
     <script type="module" src="{% static 'music_js/export_midi.js' %}"></script>
-    <script type="module" src="{% static 'music_js/player_bridge.js' %}"></script>
 
-    <!-- ✅ Tone 播放邏輯（基本範例）-->
-    <script>
-      async function playScale() {
-        await Tone.start();
-        const synth = new Tone.Synth().toDestination();
-        const notes = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
-        notes.forEach((note, i) => {
-          synth.triggerAttackRelease(note, '8n', Tone.now() + i * 0.5);
-        });
-      }
-
-      async function playMelody() {
-        await Tone.start();
-        const synth = new Tone.Synth().toDestination();
-        const melody = [
-          { time: 0, note: 'C4', duration: '8n' },
-          { time: 0.5, note: 'D4', duration: '8n' },
-          { time: 1.0, note: 'E4', duration: '8n' },
-          { time: 1.5, note: 'F4', duration: '8n' },
-        ];
-        const part = new Tone.Part((time, value) => {
-          synth.triggerAttackRelease(value.note, value.duration, time);
-        }, melody).start(0);
-
-        Tone.Transport.start();
-      }
-    </script>
 </body>
 </html>

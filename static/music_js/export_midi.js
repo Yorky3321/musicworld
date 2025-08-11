@@ -1,5 +1,4 @@
 
-import { Midi } from "https://cdn.skypack.dev/@tonejs/midi";
 import { measure } from './vexflow_demo.js';                 // 從 vexflow_demo.js 導入每個小節的資訊
 
 const noteMap = {                                            // 共用查表
