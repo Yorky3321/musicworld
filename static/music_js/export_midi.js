@@ -1,4 +1,4 @@
-
+import { Midi } from "https://cdn.skypack.dev/@tonejs/midi@2.0.27";
 import { measure } from './vexflow_demo.js';                 // 從 vexflow_demo.js 導入每個小節的資訊
 
 const noteMap = {                                            // 共用查表
@@ -11,7 +11,7 @@ console.log("共有小節數：", measure.length);
 
 document.getElementById("export-midi").addEventListener("click", () => {
     console.log("共有小節數：", measure.length);
-    const midi = new midi();                   // 構建midi檔
+    const midi = new Midi();                   // 構建midi檔
     const track = midi.addTrack();             // 構件音軌
 
     let currentTime = 0;                       // 初始化目前時間軸的位置（單位是秒）
